@@ -1,6 +1,5 @@
 import asyncio
 import gzip
-import orjson as json
 import logging
 import time
 from asyncio import sleep
@@ -112,12 +111,10 @@ class ReconnectingWebsocket:
             try:
                 evt = gzip.decompress(evt)
             except (ValueError, OSError):
+                self._log.debug(f'error parsing gzip decompress {evt}')
                 return None
-        try:
-            return json.loads(evt)
-        except ValueError:
-            self._log.debug(f'error parsing evt json:{evt}')
-            return None
+
+        return evt
 
     async def _read_loop(self):
         try:
